@@ -1,7 +1,9 @@
 
 ## About
 
-This is a set of helper scripts to make converting Wind Waker models back and forth between formats easier - specifically for making custom player models to replace Link.
+This is a set of helper scripts to make converting Twilight Princess models back and forth between formats easier - specifically for making custom player models to replace Link.
+
+These scripts were modified from LagoLunatic's [Wind Waker Model Helpers](https://github.com/LagoLunatic/ww_model_helpers).
 
 ## Table of contents
 
@@ -21,7 +23,7 @@ This is a set of helper scripts to make converting Wind Waker models back and fo
 
 ## Getting set up
 
-First download and extract the helper scripts: https://github.com/LagoLunatic/ww_model_helpers/releases/latest
+First download and extract the helper scripts: https://github.com/Sage-of-Mirrors/tp_model_helpers/latest
 
 Then you should download SuperBMD, which is the program that actually converts the models: https://github.com/LagoLunatic/SuperBMD/releases/latest  
 Extract the contents of the SuperBMD zip and put them in a folder named `SuperBMD` inside the WW Model Helpers folder - in other words, the SuperBMD folder must be next to unpack_models.exe and pack_models.exe.  

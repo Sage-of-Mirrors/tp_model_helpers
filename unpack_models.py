@@ -85,7 +85,7 @@ def extract_model_or_texture(file_entry, base_output_folder):
   else:
     command = [
       SUPERBMD_PATH,
-      "-i", output_file_name,
+      output_file_name,
     ]
     
     result = call(command)

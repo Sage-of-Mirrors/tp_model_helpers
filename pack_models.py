@@ -24,11 +24,11 @@ class ModelConversionError(Exception):
 
 def convert_to_bdl(base_folder, file_base_name):
   in_dae_path      = os.path.join(base_folder, file_base_name + ".dae")
-  out_bdl_path     = os.path.join(base_folder, file_base_name + ".bdl")
+  out_bdl_path     = os.path.join(base_folder, file_base_name + ".bmd")
   tex_headers_path = os.path.join(base_folder, "tex_headers.json")
   materials_path   = os.path.join(base_folder, "materials.json")
   
-  print("Converting %s to BDL" % in_dae_path)
+  print("Converting %s to BMD" % in_dae_path)
   
   # Check through the .dae file to see if there are any instances of <v/>, which would cause the "Invalid contents in element "n"" error when SuperBMD tries to read the file.
   with open(in_dae_path) as f:
@@ -48,12 +48,12 @@ def convert_to_bdl(base_folder, file_base_name):
   
   command = [
     SUPERBMD_PATH,
-    "-i", in_dae_path,
-    "-o", out_bdl_path,
+    in_dae_path,
+    out_bdl_path,
     "-x", tex_headers_path,
     "-m", materials_path,
-    "-t", "all",
-    "--bdl",
+	"--degeneratetri",
+	"-t", "all"
   ]
   
   result = call(command)
@@ -115,7 +115,7 @@ def copy_original_sections(out_bdl_path, orig_bdl_path, sections_to_copy):
 
 
 
-def convert_all_player_models(orig_link_folder, custom_player_folder, repack_hands_model=False, rarc_name="Link.arc", no_skip_unchanged=False):
+def convert_all_player_models(orig_link_folder, custom_player_folder, repack_hands_model=False, rarc_name="Kmdl.arc", no_skip_unchanged=False):
   orig_link_arc_path = os.path.join(orig_link_folder, rarc_name)
   with open(orig_link_arc_path, "rb") as f:
     rarc_data = BytesIO(f.read())
@@ -134,7 +134,7 @@ def convert_all_player_models(orig_link_folder, custom_player_folder, repack_han
     if file_entry.is_dir:
       continue
     basename, file_ext = os.path.splitext(file_entry.name)
-    if file_ext == ".bdl":
+    if file_ext == ".bmd":
       all_model_basenames.append(basename)
     if file_ext == ".bti":
       all_texture_basenames.append(basename)
@@ -160,7 +160,7 @@ def convert_all_player_models(orig_link_folder, custom_player_folder, repack_han
     
     new_model_folder = os.path.join(custom_player_folder, model_basename)
     if os.path.isdir(new_model_folder):
-      out_bdl_path = os.path.join(new_model_folder, model_basename + ".bdl")
+      out_bdl_path = os.path.join(new_model_folder, model_basename + ".bmd")
       
       found_any_files_to_modify = True
       
@@ -185,18 +185,19 @@ def convert_all_player_models(orig_link_folder, custom_player_folder, repack_han
       else:
         print("Skipping %s" % model_basename)
       
-      orig_bdl_path = os.path.join(orig_link_folder, model_basename, model_basename + ".bdl")
+      orig_bdl_path = os.path.join(orig_link_folder, model_basename, model_basename + ".bmd")
       
       sections_to_copy = []
-      if rarc_name.lower() == "Link.arc".lower() and model_basename in ["cl"]:
+      if rarc_name.lower() == "Kmdl.arc".lower() and model_basename in ["al", "al_head", "al_kantera"]:
         # Link needs his original INF1/JNT1 to not crash the game.
         sections_to_copy.append("INF1")
         sections_to_copy.append("JNT1")
+		sections_to_copy.append("MAT3")
       if rarc_name.lower() == "Ship.arc".lower() and model_basename in ["vfncn", "vfncr"]:
         # The boat's cannon and crane need their original JNT1 or they get rotated 90 degrees.
         sections_to_copy.append("JNT1")
       
-      link_arc.get_file_entry(model_basename + ".bdl").data = copy_original_sections(out_bdl_path, orig_bdl_path, sections_to_copy)
+      link_arc.get_file_entry(model_basename + ".bmd").data = copy_original_sections(out_bdl_path, orig_bdl_path, sections_to_copy)
   
   for texture_basename in all_texture_basenames:
     # Create texture BTI from PNG
