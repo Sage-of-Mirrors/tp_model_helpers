@@ -13,6 +13,7 @@ sys.path.insert(0, WWRANDO_PATH)
 from wwlib.rarc import RARC
 from wwlib.bti import BTIFileEntry
 from wwlib.j3d import BRK
+from wwlib.yaz0 import Yaz0
 
 def extract_all_models(rarc_path, filenames):
   with open(rarc_path, "rb") as f:
@@ -60,7 +61,13 @@ def extract_model_or_texture(file_entry, base_output_folder):
   
   with open(output_file_name, "wb") as f:
     file_entry.data.seek(0)
-    f.write(file_entry.data.read())
+
+    if Yaz0.check_is_compressed(file_entry.data):
+      decompressed_file = Yaz0.decompress(file_entry.data)
+      f.write(decompressed_file.read())
+    else:
+      file_entry.data.seek(0)
+      f.write(file_entry.data.read())
   
   if file_ext == ".bti":
     output_png_name = os.path.join(output_folder, file_basename + ".png")
@@ -85,7 +92,7 @@ def extract_model_or_texture(file_entry, base_output_folder):
   else:
     command = [
       SUPERBMD_PATH,
-      output_file_name,
+      "-i", output_file_name,
     ]
     
     result = call(command)

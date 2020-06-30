@@ -48,11 +48,11 @@ def convert_to_bdl(base_folder, file_base_name):
   
   command = [
     SUPERBMD_PATH,
-    in_dae_path,
-    out_bdl_path,
+    "-i", in_dae_path,
+    "-o", out_bdl_path,
     "-x", tex_headers_path,
     "-m", materials_path,
-	"--degeneratetri",
+	#"--degeneratetri",
 	"-t", "all"
   ]
   
@@ -188,11 +188,10 @@ def convert_all_player_models(orig_link_folder, custom_player_folder, repack_han
       orig_bdl_path = os.path.join(orig_link_folder, model_basename, model_basename + ".bmd")
       
       sections_to_copy = []
-      if rarc_name.lower() == "Kmdl.arc".lower() and model_basename in ["al", "al_head", "al_kantera"]:
+      if rarc_name.lower() in ["Kmdl.arc", "Zmdl.arc", "Mmdl.arc", "AlAnm.arc"]:
         # Link needs his original INF1/JNT1 to not crash the game.
         sections_to_copy.append("INF1")
         sections_to_copy.append("JNT1")
-		sections_to_copy.append("MAT3")
       if rarc_name.lower() == "Ship.arc".lower() and model_basename in ["vfncn", "vfncr"]:
         # The boat's cannon and crane need their original JNT1 or they get rotated 90 degrees.
         sections_to_copy.append("JNT1")
