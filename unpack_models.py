@@ -18,7 +18,8 @@ from wwlib.yaz0 import Yaz0
 def extract_all_models(rarc_path, filenames):
   with open(rarc_path, "rb") as f:
     data = BytesIO(f.read())
-  rarc = RARC(data)
+  rarc = RARC()
+  rarc.read(data)
   
   rarc_basename = os.path.splitext(os.path.basename(rarc_path))[0]
   rarc_containing_folder = os.path.dirname(rarc_path)
@@ -92,7 +93,7 @@ def extract_model_or_texture(file_entry, base_output_folder):
   else:
     command = [
       SUPERBMD_PATH,
-      "-i", output_file_name,
+      output_file_name,
     ]
     
     result = call(command)

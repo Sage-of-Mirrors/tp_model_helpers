@@ -25,8 +25,8 @@ class ModelConversionError(Exception):
 def convert_to_bdl(base_folder, file_base_name):
   in_dae_path      = os.path.join(base_folder, file_base_name + ".dae")
   out_bdl_path     = os.path.join(base_folder, file_base_name + ".bmd")
-  tex_headers_path = os.path.join(base_folder, "tex_headers.json")
-  materials_path   = os.path.join(base_folder, "materials.json")
+  tex_headers_path = os.path.join(base_folder, file_base_name + "_tex_headers.json")
+  materials_path   = os.path.join(base_folder, file_base_name + "_materials.json")
   
   print("Converting %s to BMD" % in_dae_path)
   
@@ -48,12 +48,12 @@ def convert_to_bdl(base_folder, file_base_name):
   
   command = [
     SUPERBMD_PATH,
-    "-i", in_dae_path,
-    "-o", out_bdl_path,
+    in_dae_path,
+    out_bdl_path,
     "-x", tex_headers_path,
     "-m", materials_path,
-	#"--degeneratetri",
-	"-t", "all"
+    "--degeneratetri",
+    "-t", "all"
   ]
   
   result = call(command)
@@ -119,7 +119,8 @@ def convert_all_player_models(orig_link_folder, custom_player_folder, repack_han
   orig_link_arc_path = os.path.join(orig_link_folder, rarc_name)
   with open(orig_link_arc_path, "rb") as f:
     rarc_data = BytesIO(f.read())
-  link_arc = RARC(rarc_data)
+  link_arc = RARC()
+  link_arc.read(rarc_data)
   
   
   all_model_basenames = []
@@ -155,7 +156,7 @@ def convert_all_player_models(orig_link_folder, custom_player_folder, repack_han
   found_any_files_to_modify = False
   
   for model_basename in all_model_basenames:
-    if model_basename == "hands" and not repack_hands_model:
+    if model_basename == "al_hands" and not repack_hands_model:
       continue
     
     new_model_folder = os.path.join(custom_player_folder, model_basename)
@@ -188,7 +189,8 @@ def convert_all_player_models(orig_link_folder, custom_player_folder, repack_han
       orig_bdl_path = os.path.join(orig_link_folder, model_basename, model_basename + ".bmd")
       
       sections_to_copy = []
-      if rarc_name.lower() in ["Kmdl.arc", "Zmdl.arc", "Mmdl.arc", "AlAnm.arc"]:
+      if rarc_name.lower() in ["bmdl.arc", "kmdl.arc", "mmdl.arc", "zmdl.arc", "wmdl.arc", "alanm.arc", "alink.arc"]:
+        print("Copying sections")
         # Link needs his original INF1/JNT1 to not crash the game.
         sections_to_copy.append("INF1")
         sections_to_copy.append("JNT1")
@@ -344,7 +346,8 @@ def convert_all_player_models(orig_link_folder, custom_player_folder, repack_han
   # Print out changed file sizes
   with open(orig_link_arc_path, "rb") as f:
     rarc_data = BytesIO(f.read())
-  orig_link_arc = RARC(rarc_data)
+  orig_link_arc = RARC()
+  orig_link_arc.read(rarc_data)
   for file_entry in link_arc.file_entries:
     orig_file_entry = orig_link_arc.get_file_entry(file_entry.name)
     if file_entry.is_dir:
